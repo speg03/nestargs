@@ -1,8 +1,22 @@
 [tool.poetry]
 name = "nestargs"
 version = "0.1.0"
-description = ""
+description = "Nested arguments parser"
 authors = ["Takahiro Yano <speg03@gmail.com>"]
+
+readme = "README.md"
+license = "MIT"
+
+repository = "https://github.com/speg03/nestargs"
+
+keywords = ["argparse", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
 
 [tool.poetry.dependencies]
 python = "^3.5"
