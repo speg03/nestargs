@@ -7,9 +7,9 @@ authors = ["Takahiro Yano <speg03@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 
-repository = "https://github.com/speg03/nestargs"
+homepage = "https://github.com/speg03/nestargs"
 
-keywords = ["argparse", "cli"]
+keywords = ["argparse", "arguments", "parser", "cli", "command", "line", "interface"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
