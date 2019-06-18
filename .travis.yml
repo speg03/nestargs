@@ -22,6 +22,17 @@ script:
 after_success:
   - codecov
 
+before_deploy:
+  - poetry config http-basic.pypi "$PYPI_USERNAME" "$PYPI_PASSWORD"
+
+deploy:
+  provider: script
+  script:
+    - make publish
+  on:
+    tags: true
+
 branches:
   only:
     - master
+    - /^v\d+\.\d+.\d+([a-z]+\d+)?/
