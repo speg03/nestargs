@@ -1,25 +1,23 @@
 # nestargs
 
-nestargs is a Python library that defines nested program arguments. It is based on argparse.
+nestargsは入れ子構造になったプログラム引数を定義するPythonライブラリです。argparseをもとにしています。
 
 [![PyPI](https://img.shields.io/pypi/v/nestargs.svg)](https://pypi.org/project/nestargs/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nestargs.svg)](https://pypi.org/project/nestargs/)
 [![Build Status](https://travis-ci.com/speg03/nestargs.svg?branch=master)](https://travis-ci.com/speg03/nestargs)
 [![codecov](https://codecov.io/gh/speg03/nestargs/branch/master/graph/badge.svg)](https://codecov.io/gh/speg03/nestargs)
 
-Read this in Japanese: [日本語](README.ja.md)
-
-## Installation
+## インストール
 
 ```
 pip install nestargs
 ```
 
-## Usage
+## 使い方
 
-### Basic
+### 基本
 
-Define program arguments in the same way as argparse. A nested structure can be represented by putting a dot in the program argument name.
+argparseと同じ方法でプログラム引数を定義します。プログラム引数の名前にドットを入れることで、入れ子構造を表すことができます。
 
 ```python
 import nestargs
@@ -36,21 +34,21 @@ args = parser.parse_args('--apple.n=2 --apple.price=1.5 --banana.n=3 --banana.pr
 # NestedNamespace(apple=NestedNamespace(n=2, price=1.5), banana=NestedNamespace(n=3, price=3.5))
 ```
 
-Let's take out only the program argument apple.
+プログラム引数appleだけを取り出してみましょう。
 
 ```python
 args.apple
 # NestedNamespace(n=2, price=1.5)
 ```
 
-You can also get each value.
+それぞれの値も取り出すことができます。
 
 ```python
 args.apple.price
 # 1.5
 ```
 
-If you want a dictionary format, you can get it this way.
+dict形式がよければこうして取り出すことができます。
 
 ```python
 vars(args.apple)
