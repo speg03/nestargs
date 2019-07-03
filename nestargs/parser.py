@@ -2,7 +2,7 @@ import argparse
 
 
 class NestedNamespace(argparse.Namespace):
-    DELIMITER = '.'
+    DELIMITER = "."
 
     def __setattr__(self, name, value):
         try:
@@ -15,7 +15,7 @@ class NestedNamespace(argparse.Namespace):
                 super().__setattr__(parent, NestedNamespace())
             setattr(getattr(self, parent), name, value)
         elif parent is not None:
-            raise ValueError('parent should not be empty: {}'.format(name))
+            raise ValueError("parent should not be empty: {}".format(name))
         else:
             super().__setattr__(name, value)
 
