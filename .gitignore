@@ -1,5 +1,6 @@
 # environments
 .python-version
+.venv
 
 # builds
 __pycache__
