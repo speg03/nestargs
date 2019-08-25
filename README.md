@@ -7,7 +7,7 @@ nestargs is a Python library that defines nested program arguments. It is based 
 [![Build Status](https://travis-ci.com/speg03/nestargs.svg?branch=master)](https://travis-ci.com/speg03/nestargs)
 [![codecov](https://codecov.io/gh/speg03/nestargs/branch/master/graph/badge.svg)](https://codecov.io/gh/speg03/nestargs)
 
-Read this in Japanese: [日本語](README.ja.md)
+Read this in Japanese: [日本語](https://github.com/speg03/nestargs/blob/master/README.ja.md)
 
 ## Installation
 
@@ -15,9 +15,7 @@ Read this in Japanese: [日本語](README.ja.md)
 pip install nestargs
 ```
 
-## Usage
-
-### Basic
+## Basic usage
 
 Define program arguments in the same way as argparse. A nested structure can be represented by putting a dot in the program argument name.
 
@@ -26,33 +24,69 @@ import nestargs
 
 parser = nestargs.NestedArgumentParser()
 
-parser.add_argument('--apple.n', type=int)
-parser.add_argument('--apple.price', type=float)
+parser.add_argument("--apple.n", type=int)
+parser.add_argument("--apple.price", type=float)
 
-parser.add_argument('--banana.n', type=int)
-parser.add_argument('--banana.price', type=float)
+parser.add_argument("--banana.n", type=int)
+parser.add_argument("--banana.price", type=float)
 
-args = parser.parse_args('--apple.n=2 --apple.price=1.5 --banana.n=3 --banana.price=3.5'.split())
-# NestedNamespace(apple=NestedNamespace(n=2, price=1.5), banana=NestedNamespace(n=3, price=3.5))
+args = parser.parse_args(
+    ["--apple.n=2", "--apple.price=1.5", "--banana.n=3", "--banana.price=3.5"]
+)
+# => NestedNamespace(apple=NestedNamespace(n=2, price=1.5), banana=NestedNamespace(n=3, price=3.5))
 ```
 
 Let's take out only the program argument apple.
 
 ```python
 args.apple
-# NestedNamespace(n=2, price=1.5)
+# => NestedNamespace(n=2, price=1.5)
 ```
 
 You can also get each value.
 
 ```python
 args.apple.price
-# 1.5
+# => 1.5
 ```
 
 If you want a dictionary format, you can get it this way.
 
 ```python
 vars(args.apple)
-# {'n': 2, 'price': 1.5}
+# => {'n': 2, 'price': 1.5}
+```
+
+## Define program arguments from functions
+
+The function `register_arguments` can be used to define program arguments from the parameters any function.
+
+In the following example, program arguments with multiple prefixes are defined as the `n` and `price` parameters of the function `total_price`. At this time, the behavior of the program argument is automatically determined according to the default value of the parameter.
+
+```python
+import nestargs
+
+
+def total_price(n=1, price=1.0):
+    return n * price
+
+
+parser = nestargs.NestedArgumentParser()
+parser.register_arguments(total_price, prefix="apple")
+parser.register_arguments(total_price, prefix="banana")
+
+args = parser.parse_args(
+    ["--apple.n=2", "--apple.price=1.5", "--banana.n=3", "--banana.price=3.5"]
+)
+# => NestedNamespace(apple=NestedNamespace(n=2, price=1.5), banana=NestedNamespace(n=3, price=3.5))
+```
+
+You can call the function with the values obtained from the program arguments as follows:
+
+```python
+apple = total_price(**vars(args.apple))
+banana = total_price(**vars(args.banana))
+
+print(apple + banana)
+# => 13.5
 ```
