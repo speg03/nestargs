@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nestargs"
-version = "0.2.1"
+version = "0.3.0"
 description = "Nested arguments parser"
 authors = ["Takahiro Yano <speg03@gmail.com>"]
 
@@ -11,7 +11,7 @@ homepage = "https://github.com/speg03/nestargs"
 
 keywords = ["argparse", "arguments", "parser", "cli", "command", "line", "interface"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
