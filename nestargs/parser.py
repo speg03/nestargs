@@ -66,7 +66,7 @@ class NestedArgumentParser(argparse.ArgumentParser):
 
                 options["default"] = parameter.default
 
-            argument_name = "--" + argument_prefix + name
+            argument_name = self.prefix_chars[0] * 2 + argument_prefix + name
             actions[parameter.name] = target.add_argument(argument_name, **options)
 
         return actions
