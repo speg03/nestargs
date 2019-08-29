@@ -34,10 +34,10 @@ class NestedArgumentParser(argparse.ArgumentParser):
             sig = inspect.signature(function)
 
         if prefix:
-            argument_prefix = prefix + "."
+            arg_prefix = prefix + "."
             target = self.add_argument_group(prefix)
         else:
-            argument_prefix = ""
+            arg_prefix = ""
             target = self
 
         actions = {}
@@ -51,22 +51,22 @@ class NestedArgumentParser(argparse.ArgumentParser):
                 continue  # pragma: no cover
 
             name = parameter.name
-            options = {}
+            arg_params = {}
             if parameter.default is inspect.Parameter.empty:
-                options["required"] = True
+                arg_params["required"] = True
             else:
                 if parameter.default is True:
-                    options["action"] = "store_false"
-                    options["dest"] = argument_prefix + name
+                    arg_params["action"] = "store_false"
+                    arg_params["dest"] = arg_prefix + name
                     name = "no_" + name
                 elif parameter.default is False:
-                    options["action"] = "store_true"
+                    arg_params["action"] = "store_true"
                 elif type(parameter.default) in {int, float}:
-                    options["type"] = type(parameter.default)
+                    arg_params["type"] = type(parameter.default)
 
-                options["default"] = parameter.default
+                arg_params["default"] = parameter.default
 
-            argument_name = self.prefix_chars[0] * 2 + argument_prefix + name
-            actions[parameter.name] = target.add_argument(argument_name, **options)
+            arg_name = self.prefix_chars[0] * 2 + arg_prefix + name
+            actions[parameter.name] = target.add_argument(arg_name, **arg_params)
 
         return actions
