@@ -8,6 +8,7 @@ readme = "README.md"
 license = "MIT"
 
 homepage = "https://github.com/speg03/nestargs"
+repository = "https://github.com/speg03/nestargs"
 
 keywords = ["argparse", "arguments", "parser", "cli", "command", "line", "interface"]
 classifiers = [
@@ -26,7 +27,7 @@ pytest = "^4.6"
 pytest-cov = "^2.7"
 flake8 = "^3.7"
 isort = "^4.3"
-black = {version = "^19.3b0",python = "^3.6"}
+black = { version = "^19.3b0", python = "^3.6" }
 jedi = "^0.13.3"
 
 [build-system]
