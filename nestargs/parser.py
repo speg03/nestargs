@@ -1,6 +1,8 @@
 import argparse
 import inspect
 
+from .meta import get_metadata
+
 
 class NestedNamespace(argparse.Namespace):
     DELIMITER = "."
@@ -29,9 +31,8 @@ class NestedArgumentParser(argparse.ArgumentParser):
 
     def register_arguments(self, function, prefix=None):
         if inspect.isclass(function):
-            sig = inspect.signature(function.__init__)
-        else:
-            sig = inspect.signature(function)
+            function = function.__init__
+        sig = inspect.signature(function)
 
         if prefix:
             arg_prefix = prefix + "."
@@ -65,6 +66,10 @@ class NestedArgumentParser(argparse.ArgumentParser):
                     arg_params["type"] = type(parameter.default)
 
                 arg_params["default"] = parameter.default
+
+            override_arg_params = get_metadata(function, parameter.name, "arg_params")
+            if override_arg_params:
+                arg_params.update(override_arg_params)
 
             arg_name = self.prefix_chars[0] * 2 + arg_prefix + name
             actions[parameter.name] = target.add_argument(arg_name, **arg_params)

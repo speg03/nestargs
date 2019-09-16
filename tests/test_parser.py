@@ -88,3 +88,18 @@ class TestNestedArgumentParser:
 
         args = parser.parse_args(["--some.param", "foo"])
         assert args.some.param == "foo"
+
+    def test_register_arguments_with_option_decorator(self):
+        @nestargs.option("param", nargs=2, help="help for parameter")
+        def some_function(param):
+            pass
+
+        parser = nestargs.NestedArgumentParser()
+
+        actions = parser.register_arguments(some_function, prefix="some")
+        assert actions.keys() == {"param"}
+        assert actions["param"].nargs == 2
+        assert actions["param"].help == "help for parameter"
+
+        args = parser.parse_args(["--some.param", "foo", "bar"])
+        assert args.some.param == ["foo", "bar"]
