@@ -88,3 +88,32 @@ banana = total_price(**vars(args.banana))
 print(apple + banana)
 # => 13.5
 ```
+
+### option デコレータ
+
+対象の関数に `option` デコレータを付与することで、プログラム引数の設定を追加することができます。追加できる設定は `argparse` の `ArgumentParser.add_argument` に基づきます。
+
+```python
+@nestargs.option("n", help="number of ingredients")
+@nestargs.option("price", help="unit price of ingredients")
+def total_price(n=1, price=1.0):
+    return n * price
+
+
+parser = nestargs.NestedArgumentParser()
+parser.register_arguments(total_price, prefix="apple")
+```
+
+このコードは次のコードと等価です。
+
+```python
+def total_price(n=1, price=1.0):
+    return n * price
+
+
+parser = nestargs.NestedArgumentParser()
+parser.add_argument("--apple.n", type=int, default=1, help="number of ingredients")
+parser.add_argument(
+    "--apple.price", type=float, default=1.0, help="unit price of ingredients"
+)
+```
