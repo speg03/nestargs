@@ -1,80 +1,90 @@
 import pytest
 
-from nestargs import NestedArgumentParser
-
-
-def foo_function(p1, p2=True, p3=False, p4=1):
-    pass
-
-
-class FooClass:
-    def __init__(self, param, *args, **kwargs):
-        pass
+import nestargs
 
 
 class TestNestedArgumentParser:
     def test_parse_args(self):
-        parser = NestedArgumentParser()
-        parser.add_argument("foo.a")
-        parser.add_argument("foo.b")
-        parser.add_argument("foo.bar.c")
+        parser = nestargs.NestedArgumentParser()
+        parser.add_argument("some.a")
+        parser.add_argument("some.b")
+        parser.add_argument("some.c.d")
 
         args = parser.parse_args(["1", "2", "3"])
-        assert args.foo.a == "1"
-        assert args.foo.b == "2"
-        assert args.foo.bar.c == "3"
-        assert vars(args.foo).keys() == {"a", "b", "bar"}
-        assert vars(args.foo.bar).keys() == {"c"}
+        assert args.some.a == "1"
+        assert args.some.b == "2"
+        assert args.some.c.d == "3"
+        assert vars(args.some).keys() == {"a", "b", "c"}
+        assert vars(args.some.c).keys() == {"d"}
 
     def test_parse_args_with_empty_parent(self):
-        parser = NestedArgumentParser()
+        parser = nestargs.NestedArgumentParser()
         parser.add_argument(".empty")
 
         with pytest.raises(ValueError):
             parser.parse_args([""])
 
     def test_register_arguments(self):
-        parser = NestedArgumentParser()
+        def some_function(param1, param2=True, param3=False, param4=1):
+            pass
 
-        actions = parser.register_arguments(foo_function, prefix="foo")
-        assert actions.keys() == {"p1", "p2", "p3", "p4"}
-        assert actions["p1"].required is True
-        assert actions["p2"].default is True
-        assert actions["p3"].default is False
-        assert actions["p4"].type is int
-        assert actions["p4"].default == 1
+        parser = nestargs.NestedArgumentParser()
+
+        actions = parser.register_arguments(some_function, prefix="some")
+        assert actions.keys() == {"param1", "param2", "param3", "param4"}
+        assert actions["param1"].required is True
+        assert actions["param2"].default is True
+        assert actions["param3"].default is False
+        assert actions["param4"].type is int
+        assert actions["param4"].default == 1
 
         args = parser.parse_args(
-            ["--foo.p1", "bar", "--foo.no_p2", "--foo.p3", "--foo.p4", "2"]
+            [
+                "--some.param1",
+                "foo",
+                "--some.no_param2",
+                "--some.param3",
+                "--some.param4",
+                "2",
+            ]
         )
-        assert args.foo.p1 == "bar"
-        assert args.foo.p2 is False
-        assert args.foo.p3 is True
-        assert args.foo.p4 == 2
+        assert args.some.param1 == "foo"
+        assert args.some.param2 is False
+        assert args.some.param3 is True
+        assert args.some.param4 == 2
 
     def test_register_arguments_with_no_prefixes(self):
-        parser = NestedArgumentParser()
+        def some_function(param1, param2=True, param3=False, param4=1):
+            pass
 
-        actions = parser.register_arguments(foo_function)
-        assert actions.keys() == {"p1", "p2", "p3", "p4"}
-        assert actions["p1"].required is True
-        assert actions["p2"].default is True
-        assert actions["p3"].default is False
-        assert actions["p4"].type is int
-        assert actions["p4"].default == 1
+        parser = nestargs.NestedArgumentParser()
 
-        args = parser.parse_args(["--p1", "bar", "--no_p2", "--p3", "--p4", "2"])
-        assert args.p1 == "bar"
-        assert args.p2 is False
-        assert args.p3 is True
-        assert args.p4 == 2
+        actions = parser.register_arguments(some_function)
+        assert actions.keys() == {"param1", "param2", "param3", "param4"}
+        assert actions["param1"].required is True
+        assert actions["param2"].default is True
+        assert actions["param3"].default is False
+        assert actions["param4"].type is int
+        assert actions["param4"].default == 1
+
+        args = parser.parse_args(
+            ["--param1", "foo", "--no_param2", "--param3", "--param4", "2"]
+        )
+        assert args.param1 == "foo"
+        assert args.param2 is False
+        assert args.param3 is True
+        assert args.param4 == 2
 
     def test_register_arguments_from_class(self):
-        parser = NestedArgumentParser()
+        class SomeClass:
+            def __init__(self, param, *args, **kwargs):
+                pass
 
-        actions = parser.register_arguments(FooClass, prefix="foo")
+        parser = nestargs.NestedArgumentParser()
+
+        actions = parser.register_arguments(SomeClass, prefix="some")
         assert actions.keys() == {"param"}
         assert actions["param"].required is True
 
-        args = parser.parse_args(["--foo.param", "bar"])
-        assert args.foo.param == "bar"
+        args = parser.parse_args(["--some.param", "foo"])
+        assert args.some.param == "foo"
