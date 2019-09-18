@@ -119,3 +119,24 @@ parser.add_argument(
     "--apple.price", type=float, default=1.0, help="unit price of ingredients"
 )
 ```
+
+### Ignores decorator
+
+By attaching an `ignores` decorator to the target function, you can specify parameters that do not register in the program arguments.
+
+```python
+@nestargs.ignores("tax", "shipping")
+def total_price(n=1, price=1.0, tax=1.0, shipping=0.0):
+    return n * price * tax + shipping
+
+
+parser = nestargs.NestedArgumentParser()
+parser.register_arguments(total_price, prefix="apple")
+
+args = parser.parse_args(["--apple.n=2", "--apple.price=1.5"])
+# => NestedNamespace(apple=NestedNamespace(n=2, price=1.5))
+# Not included tax and shipping parameters
+
+apple = total_price(**vars(args.apple))
+# => 3.0
+```

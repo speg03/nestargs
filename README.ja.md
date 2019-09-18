@@ -117,3 +117,24 @@ parser.add_argument(
     "--apple.price", type=float, default=1.0, help="unit price of ingredients"
 )
 ```
+
+### ignores デコレータ
+
+対象の関数に `ignores` デコレータを付与することで、プログラム引数に登録しないパラメータを指定することができます。
+
+```python
+@nestargs.ignores("tax", "shipping")
+def total_price(n=1, price=1.0, tax=1.0, shipping=0.0):
+    return n * price * tax + shipping
+
+
+parser = nestargs.NestedArgumentParser()
+parser.register_arguments(total_price, prefix="apple")
+
+args = parser.parse_args(["--apple.n=2", "--apple.price=1.5"])
+# => NestedNamespace(apple=NestedNamespace(n=2, price=1.5))
+# taxとshippingパラメータが含まれていません
+
+apple = total_price(**vars(args.apple))
+# => 3.0
+```

@@ -14,3 +14,17 @@ def option(parameter_name, **arg_params):
         return f
 
     return decorator
+
+
+def ignores(*parameter_names):
+    def decorator(f):
+        sig = inspect.signature(f)
+        for name in parameter_names:
+            if name not in sig.parameters:
+                raise ValueError(
+                    "{} doesn't have a parameter: {}".format(f.__name__, name)
+                )
+            set_metadata(f, name, "ignore", True)
+        return f
+
+    return decorator
