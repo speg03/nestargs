@@ -48,6 +48,7 @@ class NestedArgumentParser(argparse.ArgumentParser):
                 or parameter.name == "cls"
                 or parameter.kind is inspect.Parameter.VAR_POSITIONAL
                 or parameter.kind is inspect.Parameter.VAR_KEYWORD
+                or get_metadata(function, parameter.name, "ignore")
             ):
                 continue  # pragma: no cover
 

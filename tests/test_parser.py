@@ -103,3 +103,13 @@ class TestNestedArgumentParser:
 
         args = parser.parse_args(["--some.param", "foo", "bar"])
         assert args.some.param == ["foo", "bar"]
+
+    def test_register_arguments_with_ignores_decorator(self):
+        @nestargs.ignores("param2", "param3")
+        def some_function(param1, param2, param3):
+            pass
+
+        parser = nestargs.NestedArgumentParser()
+
+        actions = parser.register_arguments(some_function, prefix="some")
+        assert actions.keys() == {"param1"}
