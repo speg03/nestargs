@@ -9,3 +9,4 @@ nestargs.egg-info
 
 # tests
 .coverage
+coverage.xml
