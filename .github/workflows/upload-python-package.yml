@@ -1,4 +1,5 @@
-name: publish
+name: Upload Python Package
+
 on:
   release:
     types: [published]
