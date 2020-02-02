@@ -4,7 +4,7 @@ nestargs is a Python library that defines nested program arguments. It is based 
 
 [![PyPI](https://img.shields.io/pypi/v/nestargs.svg)](https://pypi.org/project/nestargs/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nestargs.svg)](https://pypi.org/project/nestargs/)
-[![Build Status](https://travis-ci.com/speg03/nestargs.svg?branch=master)](https://travis-ci.com/speg03/nestargs)
+[![Python Tests](https://github.com/speg03/nestargs/workflows/Python%20Tests/badge.svg)](https://github.com/speg03/nestargs/actions?query=workflow%3A%22Python+Tests%22)
 [![codecov](https://codecov.io/gh/speg03/nestargs/branch/master/graph/badge.svg)](https://codecov.io/gh/speg03/nestargs)
 
 Read this in Japanese: [日本語](https://github.com/speg03/nestargs/blob/master/README.ja.md)
