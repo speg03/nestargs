@@ -21,7 +21,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.5"
-importlib-metadata = { version = "^1.5", python = "<3.8" }
+importlib-metadata = { version = ">=1.5", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.3"
