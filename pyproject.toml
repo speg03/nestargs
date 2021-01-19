@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nestargs"
-version = "0.4.3"
+version = "0.4.4-alpha.0"
 description = "Nested arguments parser"
 authors = ["Takahiro Yano <speg03@gmail.com>"]
 
