@@ -24,11 +24,12 @@ python = "^3.5"
 importlib-metadata = { version = ">=1.5", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.3"
-pytest-cov = "^2.8"
-flake8 = "^3.7"
-isort = "^4.3"
-black = { version = "^19.10b0", python = "^3.6" }
+pytest = ">=6.0"
+pytest-cov = ">=2.8"
+black = { version = ">=19.10b0", python = "^3.6" }
+
+[tool.pytest.ini_options]
+addopts = "--cov=nestargs --cov-report=term-missing --cov-report=xml"
 
 [build-system]
 requires = ["poetry>=0.12"]
