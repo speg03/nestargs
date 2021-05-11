@@ -6,7 +6,11 @@ from .meta import set_metadata
 def option(parameter_name, **arg_params):
     def decorator(f):
         sig = inspect.signature(f)
-        if parameter_name not in sig.parameters:
+        if (
+            parameter_name not in sig.parameters
+            and inspect.Parameter.VAR_KEYWORD
+            not in (sig.parameters[k].kind for k in sig.parameters.keys())
+        ):
             raise ValueError(
                 "{} doesn't have a parameter: {}".format(f.__name__, parameter_name)
             )
