@@ -13,6 +13,14 @@ class TestOption:
         expected = {"nargs": 2, "help": "help for parameter"}
         assert get_metadata(some_function, "param", "arg_params") == expected
 
+    def test_option_with_kwargs(self):
+        @nestargs.option("param", nargs=2, help="help for parameter")
+        def some_function(**kwargs):
+            pass
+
+        expected = {"nargs": 2, "help": "help for parameter"}
+        assert get_metadata(some_function, "param", "arg_params") == expected
+
     def test_option_with_invalid_parameter(self):
         with pytest.raises(ValueError):
 
