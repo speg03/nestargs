@@ -1,36 +1,56 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
 name = "nestargs"
-version = "0.5.1-alpha.0"
 description = "Nested arguments parser"
-authors = ["Takahiro Yano <speg03@gmail.com>"]
+authors = [{ name = "Takahiro Yano", email = "speg03@gmail.com" }]
 
 readme = "README.md"
 license = "MIT"
 
-homepage = "https://github.com/speg03/nestargs"
-repository = "https://github.com/speg03/nestargs"
+requires-python = ">=3.5"
 
-keywords = ["argparse", "arguments", "parser", "cli", "command", "line", "interface"]
+keywords = [
+    "argparse",
+    "arguments",
+    "parser",
+    "cli",
+    "command",
+    "line",
+    "interface",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Topic :: Software Development :: Libraries :: Python Modules"
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.5"
-importlib-metadata = { version = ">=1.5", python = "<3.8" }
+dynamic = ["version"]
 
-[tool.poetry.dev-dependencies]
-pytest = ">=6.0"
-pytest-cov = ">=2.8"
-black = { version = ">=19.10b0", python = "^3.6" }
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov"]
+
+[project.urls]
+Repository = "https://github.com/speg03/nestargs"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/nestargs/_version.py"
 
 [tool.pytest.ini_options]
 addopts = "--cov=nestargs --cov-report=term-missing --cov-report=xml"
 
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+[tool.coverage.run]
+omit = ["src/nestargs/_version.py"]
