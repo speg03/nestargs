@@ -2,12 +2,11 @@
 
 nestargs is a Python library that defines nested program arguments. It is based on argparse.
 
-[![PyPI](https://img.shields.io/pypi/v/nestargs.svg)](https://pypi.org/project/nestargs/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nestargs.svg)](https://pypi.org/project/nestargs/)
-[![Python Tests](https://github.com/speg03/nestargs/workflows/Python%20Tests/badge.svg)](https://github.com/speg03/nestargs/actions?query=workflow%3A%22Python+Tests%22)
-[![codecov](https://codecov.io/gh/speg03/nestargs/branch/master/graph/badge.svg)](https://codecov.io/gh/speg03/nestargs)
-
-Read this in Japanese: [日本語](https://github.com/speg03/nestargs/blob/master/README.ja.md)
+[![PyPI](https://img.shields.io/pypi/v/nestargs)](https://pypi.org/project/nestargs/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nestargs)](https://pypi.org/project/nestargs/)
+[![Python Tests](https://github.com/speg03/nestargs/actions/workflows/python-tests.yml/badge.svg)](https://github.com/speg03/nestargs/actions/workflows/python-tests.yml)
+[![codecov](https://codecov.io/gh/speg03/nestargs/graph/badge.svg?token=mOzO3kbpDl)](https://codecov.io/gh/speg03/nestargs)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/speg03/nestargs/main.svg)](https://results.pre-commit.ci/latest/github/speg03/nestargs/main)
 
 ## Installation
 

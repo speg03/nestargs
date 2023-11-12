@@ -2,31 +2,80 @@ name: Python Tests
 
 on:
   push:
-    branches:
-    - master
+    branches: [main]
   pull_request:
+  release:
+    types: [published]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: python3 -m pip install build
+
+      - name: Build
+        run: make dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: packages
+          path: ./dist
+          retention-days: 1
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - uses: snok/install-poetry@v1.1.1
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
 
-    - name: Install dependencies
-      run: poetry install
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: packages
+          path: ./dist
 
-    - name: Test with pytest
-      run: poetry run pytest -v ./tests
+      - name: Install dependencies
+        run: python3 -m pip install "$(find ./dist -name '*-py3-none-any.whl' | tail -1)[test]"
 
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Test
+        run: make test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+
+  publish:
+    needs: test
+    if: github.event_name == 'release' && github.event.action == 'published'
+    permissions:
+      id-token: write
+    environment:
+      name: release
+      url: https://pypi.org/project/${{ github.event.repository.name }}/
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: packages
+          path: ./dist
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
