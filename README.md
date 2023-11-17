@@ -1,6 +1,6 @@
 # nestargs
 
-nestargs is a Python library that defines nested program arguments. It is based on argparse.
+*nestargs* is a Python library that treats command line arguments as a hierarchical structure. The functionality for interpreting command line arguments is the same as argparse.
 
 [![PyPI](https://img.shields.io/pypi/v/nestargs)](https://pypi.org/project/nestargs/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nestargs)](https://pypi.org/project/nestargs/)
@@ -16,7 +16,7 @@ pip install nestargs
 
 ## Basic usage
 
-Define program arguments in the same way as argparse. A nested structure can be represented by putting a dot in the program argument name.
+When defining command line arguments, use "." as the delimiter. to represent a variable hierarchy. The following code example defines an `n` and `price` variable in the `apple` hierarchy and another separate `n` and `price` variable in the `banana` hierarchy.
 
 ```python
 import nestargs
@@ -35,21 +35,21 @@ args = parser.parse_args(
 # => _NestedNamespace(apple=_NestedNamespace(n=2, price=1.5), banana=_NestedNamespace(n=3, price=3.5))
 ```
 
-Let's take out only the program argument apple.
+Variables obtained by parsing command line arguments can be referenced by hierarchy.
 
 ```python
 args.apple
 # => _NestedNamespace(n=2, price=1.5)
 ```
 
-You can also get each value.
+Of course, you can also refer directly to variables lower down in the hierarchy.
 
 ```python
 args.apple.price
 # => 1.5
 ```
 
-If you want a dictionary format, you can get it this way.
+When referring to each level of hierarchy, you can use `vars` to create a dictionary format.
 
 ```python
 vars(args.apple)
@@ -68,4 +68,11 @@ parser.add_argument("--apple/n", type=int)
 
 args = parser.parse_args(["--apple/n=1"])
 # => _NestedNamespace(apple=_NestedNamespace(n=1))
+```
+
+However, references to variables must be separated by "." delimiter when referring to variables.
+
+```python
+args.apple.n
+# => 1
 ```
