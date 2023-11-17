@@ -27,6 +27,12 @@ class NestedArgumentParser(argparse.ArgumentParser):
     """ArgumentParser that supports nested namespaces."""
 
     def __init__(self, delimiter: str = DEFAULT_DELIMITER, **kwargs):
+        """Initialize NestedArgumentParser.
+
+        Args:
+            delimiter: Delimiter for nested namespaces.
+            **kwargs: Keyword arguments for argparse.ArgumentParser.
+        """
         self.delimiter = delimiter
         super().__init__(**kwargs)
 
