@@ -32,14 +32,14 @@ parser.add_argument("--banana.price", type=float)
 args = parser.parse_args(
     ["--apple.n=2", "--apple.price=1.5", "--banana.n=3", "--banana.price=3.5"]
 )
-# => NestedNamespace(apple=NestedNamespace(n=2, price=1.5), banana=NestedNamespace(n=3, price=3.5))
+# => _NestedNamespace(apple=_NestedNamespace(n=2, price=1.5), banana=_NestedNamespace(n=3, price=3.5))
 ```
 
 Let's take out only the program argument apple.
 
 ```python
 args.apple
-# => NestedNamespace(n=2, price=1.5)
+# => _NestedNamespace(n=2, price=1.5)
 ```
 
 You can also get each value.
@@ -54,4 +54,18 @@ If you want a dictionary format, you can get it this way.
 ```python
 vars(args.apple)
 # => {'n': 2, 'price': 1.5}
+```
+
+## Use a different delimiter for namespace
+
+The default namespace delimiter is "." but can be any other character. In that case, specify the delimiter in the `NestedArgumentParser` constructor argument.
+
+```python
+import nestargs
+
+parser = nestargs.NestedArgumentParser(delimiter="/")
+parser.add_argument("--apple/n", type=int)
+
+args = parser.parse_args(["--apple/n=1"])
+# => _NestedNamespace(apple=_NestedNamespace(n=1))
 ```
