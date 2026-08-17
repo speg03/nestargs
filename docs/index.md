@@ -10,7 +10,7 @@ pip install nestargs
 
 ## Basic usage
 
-When defining command line arguments, use "." as the delimiter. to represent a variable hierarchy. The following code example defines an `n` and `price` variable in the `apple` hierarchy and another separate `n` and `price` variable in the `banana` hierarchy.
+When defining command line arguments, use "." as the delimiter to represent a variable hierarchy. The following code example defines an `n` and `price` variable in the `apple` hierarchy and another separate `n` and `price` variable in the `banana` hierarchy.
 
 ```python
 import nestargs
