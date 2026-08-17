@@ -1,0 +1,35 @@
+[project]
+site_url = "https://speg03.github.io/nestargs/"
+site_name = "nestargs"
+site_description = "Nested arguments parser"
+site_author = "Takahiro Yano"
+
+copyright = "Copyright &copy; 2019-2026 Takahiro Yano"
+
+repo_url = "https://github.com/speg03/nestargs"
+repo_name = "speg03/nestargs"
+edit_uri = "edit/main/docs/"
+
+nav = [
+  { "Get started" = "index.md" },
+]
+
+[project.theme]
+language = "en"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"

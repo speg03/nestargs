@@ -24,3 +24,11 @@ test:
 .PHONY: dist
 dist:
 	uv build
+
+.PHONY: docs
+docs:
+	uv run zensical build --clean --strict
+
+.PHONY: serve
+serve:
+	uv run zensical serve
