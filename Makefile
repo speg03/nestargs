@@ -5,14 +5,30 @@ all: dist
 clean:
 	rm -rf ./dist
 
+.PHONY: install
+install:
+	uv sync --dev
+
+.PHONY: deps
+deps:
+	uv lock --upgrade
+
 .PHONY: lint
 lint:
-	pre-commit run --all-files
+	uv run pre-commit run --all-files
 
 .PHONY: test
 test:
-	pytest -v ./tests
+	uv run pytest -v ./tests
 
 .PHONY: dist
 dist:
-	python3 -m build
+	uv build
+
+.PHONY: docs
+docs:
+	uv run zensical build --clean --strict
+
+.PHONY: serve
+serve:
+	uv run zensical serve

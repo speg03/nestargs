@@ -1,0 +1,19 @@
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "uv version ${nextRelease.version} && uv build",
+        "publishCmd": "uv publish"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": ["dist/*.tar.gz", "dist/*.whl"]
+      }
+    ]
+  ]
+}
