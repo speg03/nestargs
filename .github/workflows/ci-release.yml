@@ -1,0 +1,59 @@
+name: "CI / Release"
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-release-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install the latest version of uv and set the python version
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: uv sync --dev --upgrade
+      - name: Test with python ${{ matrix.python-version }}
+        run: make test
+      - name: Upload coverage reports
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        if: env.CODECOV_TOKEN != ''
+        uses: codecov/codecov-action@v7
+
+  release:
+    needs: test
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    environment:
+      name: pypi.org
+      url: https://pypi.org/project/${{ github.event.repository.name }}/
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --yes \
+              --package semantic-release@25 \
+              --package @semantic-release/exec@7 \
+              semantic-release
