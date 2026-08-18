@@ -11,6 +11,7 @@ concurrency:
 jobs:
   test:
     uses: ./.github/workflows/python-tests.yml
+    secrets: inherit
 
   release:
     needs: test
