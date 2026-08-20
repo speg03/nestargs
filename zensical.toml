@@ -12,6 +12,8 @@ edit_uri = "edit/main/docs/"
 
 nav = [
   { "Get started" = "index.md" },
+  { "Concept" = "concept.md" },
+  { "User guide" = "guide.md" },
 ]
 
 [project.theme]
