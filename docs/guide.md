@@ -21,7 +21,7 @@ args = parser.parse_args(
 # => _NestedNamespace(apple=_NestedNamespace(n=2, price=1.5), banana=_NestedNamespace(n=3, price=3.5))
 ```
 
-Arguments Obtained by parsing command-line arguments can be accessed through their hierarchical structure.
+Arguments obtained by parsing command-line arguments can be accessed through their hierarchical structure.
 
 ```python
 args.apple
