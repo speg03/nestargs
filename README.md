@@ -1,6 +1,6 @@
 # nestargs
 
-_nestargs_ is a Python library that treats command line arguments as a hierarchical structure. The functionality for interpreting command line arguments is the same as argparse.
+_nestargs_ is a Python library for conveniently handling structured data through command-line arguments. It provides an argparse-compatible interface while organizing parsed values into a hierarchy.
 
 [![PyPI](https://img.shields.io/pypi/v/nestargs)](https://pypi.org/project/nestargs/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nestargs)](https://pypi.org/project/nestargs/)
@@ -10,8 +10,14 @@ _nestargs_ is a Python library that treats command line arguments as a hierarchi
 
 ## Installation
 
+```console
+$ pip install nestargs
 ```
-pip install nestargs
+
+Or install it with [uv](https://docs.astral.sh/uv/):
+
+```console
+$ uv add nestargs
 ```
 
 ## Documentation
