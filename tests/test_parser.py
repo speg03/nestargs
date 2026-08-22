@@ -127,6 +127,26 @@ class TestNestedArgumentParser:
         with pytest.raises(SystemExit):
             parser.parse_args(["--user.profile", "age: 44"])
 
+    def test_add_arguments_from_dict_parses_list_values_as_json(self):
+        parser = nestargs.NestedArgumentParser()
+        parser.add_arguments_from_dict({"values": [1, "default"]})
+
+        definitions = parser.create_argument_definitions_from_dict(
+            {"values": [1, "default"]}
+        )
+        assert definitions == [
+            nestargs.ArgumentDefinition(
+                "--values",
+                default=[1, "default"],
+                type=definitions[0].type,
+                dest="values",
+            )
+        ]
+
+        assert parser.parse_args([]).values == [1, "default"]
+        args = parser.parse_args(["--values", '[1, "text", true, null]'])
+        assert args.values == [1, "text", True, None]
+
     def test_add_arguments_from_dict_parses_boolean_values(self):
         parser = nestargs.NestedArgumentParser()
         parser.add_arguments_from_dict({"enabled": True})

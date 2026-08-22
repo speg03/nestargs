@@ -159,6 +159,17 @@ class NestedArgumentParser(argparse.ArgumentParser):
                         )
                     continue
 
+                if isinstance(value, list):
+                    definitions.append(
+                        ArgumentDefinition(
+                            name=option_name,
+                            default=value,
+                            type=_parse_json,
+                            dest=full_dest,
+                        )
+                    )
+                    continue
+
                 definitions.append(
                     ArgumentDefinition(
                         name=option_name,
