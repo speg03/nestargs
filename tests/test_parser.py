@@ -1,5 +1,6 @@
-import nestargs
 import pytest
+
+import nestargs
 
 
 class TestNestedArgumentParser:
@@ -35,3 +36,130 @@ class TestNestedArgumentParser:
 
         with pytest.raises(ValueError):
             parser.parse_args([""])
+
+    def test_add_arguments_from_dataclass(self):
+        parser = nestargs.NestedArgumentParser()
+        parser.add_arguments(
+            [
+                nestargs.ArgumentDefinition("user.name", type=str),
+                nestargs.ArgumentDefinition("user.age", type=int, default=0),
+                nestargs.ArgumentDefinition(
+                    "--count", type=int, default=1, dest="limit"
+                ),
+            ]
+        )
+
+        args = parser.parse_args(["alice", "42", "--count", "7"])
+        assert args.user.name == "alice"
+        assert args.user.age == 42
+        assert args.limit == 7
+
+    def test_add_arguments_accepts_varargs(self):
+        parser = nestargs.NestedArgumentParser()
+        parser.add_arguments(
+            nestargs.ArgumentDefinition("user.name", type=str),
+            nestargs.ArgumentDefinition("user.tags", nargs="*", default=[]),
+        )
+
+        args = parser.parse_args(["alice", "red", "blue"])
+        assert args.user.name == "alice"
+        assert args.user.tags == ["red", "blue"]
+
+    def test_add_arguments_preserves_explicit_none_default(self):
+        parser = nestargs.NestedArgumentParser()
+        parser.add_arguments(
+            nestargs.ArgumentDefinition(
+                "--mode", nargs="?", default=None, type=str, dest="mode"
+            )
+        )
+
+        args = parser.parse_args([])
+        assert args.mode is None
+
+        args = parser.parse_args(["--mode", "fast"])
+        assert args.mode == "fast"
+
+    def test_create_argument_definitions_from_dict(self):
+        definitions = nestargs.create_argument_definitions_from_dict(
+            {
+                "user": {
+                    "name": "alice",
+                    "profile": {"age": 42},
+                },
+                "enabled": True,
+            },
+            max_depth=1,
+        )
+
+        assert definitions == [
+            nestargs.ArgumentDefinition(
+                "--user.name",
+                default="alice",
+                type=str,
+                dest="user.name",
+            ),
+            nestargs.ArgumentDefinition(
+                "--user.profile",
+                default="{'age': 42}",
+                type=str,
+                dest="user.profile",
+            ),
+            nestargs.ArgumentDefinition(
+                "--enabled",
+                default=True,
+                type=bool,
+                dest="enabled",
+            ),
+        ]
+
+    def test_create_argument_definitions_from_dict_replaces_underscores(self):
+        definitions = nestargs.create_argument_definitions_from_dict(
+            {"_foo_bar_": "foobar"},
+            max_depth=0,
+        )
+
+        assert definitions == [
+            nestargs.ArgumentDefinition(
+                "--foo-bar",
+                default="foobar",
+                type=str,
+                dest="_foo_bar_",
+            )
+        ]
+
+    def test_create_argument_definitions_from_nested_dict_with_underscores(self):
+        definitions = nestargs.create_argument_definitions_from_dict(
+            {"user_profile": {"_first_name_": "alice"}},
+            max_depth=1,
+            delimiter="/",
+        )
+
+        assert definitions == [
+            nestargs.ArgumentDefinition(
+                "--user-profile/first-name",
+                default="alice",
+                type=str,
+                dest="user_profile/_first_name_",
+            )
+        ]
+
+    def test_add_arguments_from_dict_uses_parser_delimiter(self):
+        parser = nestargs.NestedArgumentParser(delimiter="/")
+        parser.add_arguments_from_dict({"user": {"name": "alice"}}, max_depth=1)
+
+        args = parser.parse_args(["--user/name", "alice"])
+        assert args.user.name == "alice"
+
+        definitions = nestargs.create_argument_definitions_from_dict(
+            {"user": {"name": "alice"}},
+            max_depth=1,
+            delimiter="/",
+        )
+        assert definitions == [
+            nestargs.ArgumentDefinition(
+                "--user/name",
+                default="alice",
+                type=str,
+                dest="user/name",
+            )
+        ]
