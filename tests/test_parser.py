@@ -1,3 +1,5 @@
+import argparse
+
 import pytest
 
 import nestargs
@@ -92,26 +94,38 @@ class TestNestedArgumentParser:
             max_depth=1,
         )
 
-        assert definitions[:2] == [
-            nestargs.ArgumentDefinition(
-                "--user.name",
-                default="alice",
-                type=str,
-                dest="user.name",
-            ),
-            nestargs.ArgumentDefinition(
-                "--user.profile",
-                default="{'age': 42}",
-                type=str,
-                dest="user.profile",
-            ),
-        ]
+        assert definitions[0] == nestargs.ArgumentDefinition(
+            "--user.name",
+            default="alice",
+            type=str,
+            dest="user.name",
+        )
+        profile_definition = definitions[1]
+        assert profile_definition.name == "--user.profile"
+        assert profile_definition.default == {"age": 42}
+        assert profile_definition.dest == "user.profile"
+        assert profile_definition.type('{"age": 43}') == {"age": 43}
+        with pytest.raises(argparse.ArgumentTypeError):
+            profile_definition.type("age: 44")
         boolean_definition = definitions[2]
         assert boolean_definition.name == "--enabled"
         assert boolean_definition.default is True
         assert boolean_definition.dest == "enabled"
         assert boolean_definition.type("true") is True
         assert boolean_definition.type("false") is False
+
+    def test_add_arguments_from_dict_parses_deep_dict_as_json(self):
+        parser = nestargs.NestedArgumentParser()
+        parser.add_arguments_from_dict(
+            {"user": {"profile": {"age": 42}}},
+            max_depth=1,
+        )
+
+        args = parser.parse_args(["--user.profile", '{"age": 43}'])
+        assert args.user.profile == {"age": 43}
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--user.profile", "age: 44"])
 
     def test_add_arguments_from_dict_parses_boolean_values(self):
         parser = nestargs.NestedArgumentParser()

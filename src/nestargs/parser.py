@@ -1,4 +1,5 @@
 import argparse
+import json
 from dataclasses import dataclass
 from typing import Any
 
@@ -37,6 +38,13 @@ def _parse_bool(value: str) -> bool:
     if normalized == "false":
         return False
     raise argparse.ArgumentTypeError("expected 'true' or 'false'")
+
+
+def _parse_json(value: str) -> Any:
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError as error:
+        raise argparse.ArgumentTypeError(str(error)) from error
 
 
 def _infer_argument_type(value: Any):
@@ -144,8 +152,8 @@ class NestedArgumentParser(argparse.ArgumentParser):
                         definitions.append(
                             ArgumentDefinition(
                                 name=option_name,
-                                default=str(value),
-                                type=str,
+                                default=value,
+                                type=_parse_json,
                                 dest=full_dest,
                             )
                         )
