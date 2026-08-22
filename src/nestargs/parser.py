@@ -53,58 +53,6 @@ def _infer_argument_type(value: Any):
     return str
 
 
-def create_argument_definitions_from_dict(
-    values: dict[str, Any],
-    *,
-    max_depth: int = 1,
-    delimiter: str = DEFAULT_DELIMITER,
-    prefix: tuple[str, ...] = (),
-):
-    """Create ArgumentDefinition objects from a nested dictionary.
-
-    Arguments deeper than max_depth are treated as a single string-valued CLI argument
-    whose value is the literal string representation of the nested dict.
-    """
-    if not isinstance(values, dict):
-        raise TypeError(f"values must be dict, got {type(values).__name__}")
-    if max_depth < 0:
-        raise ValueError("max_depth must be >= 0")
-
-    definitions: list[ArgumentDefinition] = []
-
-    def _walk(current: dict[str, Any], depth: int, path: tuple[str, ...]):
-        for key, value in current.items():
-            current_path = (*path, str(key))
-            full_dest = delimiter.join(current_path)
-            option_name = _build_option_name(current_path, delimiter=delimiter)
-
-            if isinstance(value, dict):
-                if depth < max_depth:
-                    _walk(value, depth + 1, current_path)
-                else:
-                    definitions.append(
-                        ArgumentDefinition(
-                            name=option_name,
-                            default=str(value),
-                            type=str,
-                            dest=full_dest,
-                        )
-                    )
-                continue
-
-            definitions.append(
-                ArgumentDefinition(
-                    name=option_name,
-                    default=value,
-                    type=_infer_argument_type(value),
-                    dest=full_dest,
-                )
-            )
-
-    _walk(values, 0, prefix)
-    return definitions
-
-
 def create_namespace(delimiter: str):
     class _NestedNamespace(argparse.Namespace):
         def __setattr__(self, name, value):
@@ -162,21 +110,69 @@ class NestedArgumentParser(argparse.ArgumentParser):
 
             self.add_argument(definition.name, **kwargs)
 
+    def create_argument_definitions_from_dict(
+        self,
+        values: dict[str, Any],
+        *,
+        max_depth: int = 1,
+    ):
+        """Create ArgumentDefinition objects from a nested dictionary.
+
+        Arguments deeper than max_depth are treated as a single string-valued CLI
+        argument whose value is the literal string representation of the nested dict.
+        """
+        if not isinstance(values, dict):
+            raise TypeError(f"values must be dict, got {type(values).__name__}")
+        if max_depth < 0:
+            raise ValueError("max_depth must be >= 0")
+
+        definitions: list[ArgumentDefinition] = []
+
+        def _walk(current: dict[str, Any], depth: int, path: tuple[str, ...]):
+            for key, value in current.items():
+                current_path = (*path, str(key))
+                full_dest = self.delimiter.join(current_path)
+                option_name = _build_option_name(
+                    current_path,
+                    delimiter=self.delimiter,
+                )
+
+                if isinstance(value, dict):
+                    if depth < max_depth:
+                        _walk(value, depth + 1, current_path)
+                    else:
+                        definitions.append(
+                            ArgumentDefinition(
+                                name=option_name,
+                                default=str(value),
+                                type=str,
+                                dest=full_dest,
+                            )
+                        )
+                    continue
+
+                definitions.append(
+                    ArgumentDefinition(
+                        name=option_name,
+                        default=value,
+                        type=_infer_argument_type(value),
+                        dest=full_dest,
+                    )
+                )
+
+        _walk(values, 0, ())
+        return definitions
+
     def add_arguments_from_dict(
         self,
         values: dict[str, Any],
         *,
         max_depth: int = 1,
-        delimiter: str | None = None,
     ):
         """Register arguments created from a nested dictionary."""
-        if delimiter is None:
-            delimiter = self.delimiter
-
-        definitions = create_argument_definitions_from_dict(
+        definitions = self.create_argument_definitions_from_dict(
             values,
             max_depth=max_depth,
-            delimiter=delimiter,
         )
         self.add_arguments(definitions)
 

@@ -80,7 +80,8 @@ class TestNestedArgumentParser:
         assert args.mode == "fast"
 
     def test_create_argument_definitions_from_dict(self):
-        definitions = nestargs.create_argument_definitions_from_dict(
+        parser = nestargs.NestedArgumentParser()
+        definitions = parser.create_argument_definitions_from_dict(
             {
                 "user": {
                     "name": "alice",
@@ -123,7 +124,8 @@ class TestNestedArgumentParser:
             parser.parse_args(["--enabled", "invalid"])
 
     def test_create_argument_definitions_from_dict_replaces_underscores(self):
-        definitions = nestargs.create_argument_definitions_from_dict(
+        parser = nestargs.NestedArgumentParser()
+        definitions = parser.create_argument_definitions_from_dict(
             {"_foo_bar_": "foobar"},
             max_depth=0,
         )
@@ -138,10 +140,10 @@ class TestNestedArgumentParser:
         ]
 
     def test_create_argument_definitions_from_nested_dict_with_underscores(self):
-        definitions = nestargs.create_argument_definitions_from_dict(
+        parser = nestargs.NestedArgumentParser(delimiter="/")
+        definitions = parser.create_argument_definitions_from_dict(
             {"user_profile": {"_first_name_": "alice"}},
             max_depth=1,
-            delimiter="/",
         )
 
         assert definitions == [
@@ -160,10 +162,9 @@ class TestNestedArgumentParser:
         args = parser.parse_args(["--user/name", "alice"])
         assert args.user.name == "alice"
 
-        definitions = nestargs.create_argument_definitions_from_dict(
+        definitions = parser.create_argument_definitions_from_dict(
             {"user": {"name": "alice"}},
             max_depth=1,
-            delimiter="/",
         )
         assert definitions == [
             nestargs.ArgumentDefinition(
