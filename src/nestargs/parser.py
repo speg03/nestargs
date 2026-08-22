@@ -30,11 +30,20 @@ def _build_option_name(
     return f"--{normalized}"
 
 
+def _parse_bool(value: str) -> bool:
+    normalized = value.lower()
+    if normalized == "true":
+        return True
+    if normalized == "false":
+        return False
+    raise argparse.ArgumentTypeError("expected 'true' or 'false'")
+
+
 def _infer_argument_type(value: Any):
     if value is None:
         return None
     if isinstance(value, bool):
-        return bool
+        return _parse_bool
     if isinstance(value, int):
         return int
     if isinstance(value, float):

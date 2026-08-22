@@ -91,7 +91,7 @@ class TestNestedArgumentParser:
             max_depth=1,
         )
 
-        assert definitions == [
+        assert definitions[:2] == [
             nestargs.ArgumentDefinition(
                 "--user.name",
                 default="alice",
@@ -104,13 +104,23 @@ class TestNestedArgumentParser:
                 type=str,
                 dest="user.profile",
             ),
-            nestargs.ArgumentDefinition(
-                "--enabled",
-                default=True,
-                type=bool,
-                dest="enabled",
-            ),
         ]
+        boolean_definition = definitions[2]
+        assert boolean_definition.name == "--enabled"
+        assert boolean_definition.default is True
+        assert boolean_definition.dest == "enabled"
+        assert boolean_definition.type("true") is True
+        assert boolean_definition.type("false") is False
+
+    def test_add_arguments_from_dict_parses_boolean_values(self):
+        parser = nestargs.NestedArgumentParser()
+        parser.add_arguments_from_dict({"enabled": True})
+
+        assert parser.parse_args(["--enabled", "true"]).enabled is True
+        assert parser.parse_args(["--enabled", "false"]).enabled is False
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--enabled", "invalid"])
 
     def test_create_argument_definitions_from_dict_replaces_underscores(self):
         definitions = nestargs.create_argument_definitions_from_dict(
