@@ -143,11 +143,11 @@ class NestedArgumentParser(argparse.ArgumentParser):
         *,
         max_depth: int = 1,
     ):
-"""Create ArgumentDefinition objects from a nested dictionary.
+        """Create ArgumentDefinition objects from a nested dictionary.
 
-Lists, and dictionaries deeper than max_depth, are treated as a single CLI argument
-whose value is supplied as JSON (array/object respectively).
-"""
+        Lists, and dictionaries deeper than max_depth, are treated as a single CLI argument
+        whose value is supplied as JSON (array/object respectively).
+        """
         if not isinstance(values, dict):
             raise TypeError(f"values must be dict, got {type(values).__name__}")
         if max_depth < 0:
