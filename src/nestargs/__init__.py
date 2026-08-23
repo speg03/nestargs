@@ -1,6 +1,12 @@
 import importlib.metadata
 
-from .parser import NestedArgumentParser  # noqa: F401
+from .parser import ArgumentDefinition, ArgumentTypeError, NestedArgumentParser
+
+__all__ = [
+    "ArgumentDefinition",
+    "ArgumentTypeError",
+    "NestedArgumentParser",
+]
 
 __version__ = "0+unknown"
 if __package__:

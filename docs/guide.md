@@ -42,6 +42,87 @@ vars(args.apple)
 # => {'n': 2, 'price': 1.5}
 ```
 
+## Defining arguments from a dictionary
+
+Use `add_arguments_from_dict` to define arguments from a dictionary of default
+values. Keys become long option names, and nested dictionaries become nested
+namespaces. Scalar values infer their command-line type from the default value.
+
+```python
+import nestargs
+
+parser = nestargs.NestedArgumentParser()
+parser.add_arguments_from_dict(
+    {
+        "server": {
+            "host": "localhost",
+            "port": 8080,
+        },
+        "debug": False,
+    }
+)
+
+args = parser.parse_args(["--server.host", "example.com", "--debug", "true"])
+
+args.server.host
+# => 'example.com'
+args.server.port
+# => 8080
+args.debug
+# => True
+```
+
+The inferred scalar types are `bool`, `int`, `float`, and `str`. Boolean values
+must be supplied as `true` or `false`.
+
+Dictionary keys are converted to long option names as follows:
+
+- Every option name starts with `--`.
+- Leading and trailing underscores are removed from the option name.
+- Remaining underscores are replaced with hyphens.
+- Nested key separators use the parser's delimiter.
+
+For example, `_first_name_` under `user_profile` becomes the option
+`--user-profile.first-name`, while the parsed value is accessible as
+`args.user_profile._first_name_`.
+
+### JSON values for lists and deep dictionaries
+
+Lists are supplied as one JSON array argument. Dictionaries deeper than
+`max_depth` are supplied as one JSON object argument. Their default values remain
+structured Python values when the option is omitted.
+
+```python
+import nestargs
+
+parser = nestargs.NestedArgumentParser()
+parser.add_arguments_from_dict(
+    {
+        "tags": ["stable"],
+        "service": {
+            "connection": {
+                "timeout": 30,
+            },
+        },
+    },
+    max_depth=1,
+)
+
+args = parser.parse_args(
+    [
+        "--tags",
+        '["stable", "fast"]',
+        "--service.connection",
+        '{"timeout": 60}',
+    ]
+)
+
+args.tags
+# => ['stable', 'fast']
+args.service.connection
+# => {'timeout': 60}
+```
+
 ## Using a different namespace delimiter
 
 The default namespace delimiter is a period (`.`), but you can use any other character. To do so, specify the delimiter as an argument to the `NestedArgumentParser` constructor.
