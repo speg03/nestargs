@@ -139,6 +139,18 @@ class NestedArgumentParser(argparse.ArgumentParser):
             raise ValueError("max_depth must be >= 0")
 
         definitions: list[ArgumentDefinition] = []
+        destinations_by_option_name: dict[str, str] = {}
+
+        def _add_definition(definition: ArgumentDefinition):
+            previous_dest = destinations_by_option_name.get(definition.name)
+            if previous_dest is not None:
+                raise ValueError(
+                    f"Option name collision: {definition.name!r} is generated from "
+                    f"both {previous_dest!r} and {definition.dest!r}"
+                )
+
+            destinations_by_option_name[definition.name] = definition.dest or ""
+            definitions.append(definition)
 
         def _walk(current: dict[str, Any], depth: int, path: tuple[str, ...]):
             for key, value in current.items():
@@ -153,7 +165,7 @@ class NestedArgumentParser(argparse.ArgumentParser):
                     if depth < max_depth:
                         _walk(value, depth + 1, current_path)
                     else:
-                        definitions.append(
+                        _add_definition(
                             ArgumentDefinition(
                                 name=option_name,
                                 default=value,
@@ -164,7 +176,7 @@ class NestedArgumentParser(argparse.ArgumentParser):
                     continue
 
                 if isinstance(value, list):
-                    definitions.append(
+                    _add_definition(
                         ArgumentDefinition(
                             name=option_name,
                             default=value,
@@ -174,7 +186,7 @@ class NestedArgumentParser(argparse.ArgumentParser):
                     )
                     continue
 
-                definitions.append(
+                _add_definition(
                     ArgumentDefinition(
                         name=option_name,
                         default=value,

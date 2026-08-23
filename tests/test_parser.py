@@ -147,6 +147,19 @@ class TestNestedArgumentParser:
         with pytest.raises(ValueError, match="max_depth must be >= 0"):
             parser.create_argument_definitions_from_dict({}, max_depth=-1)
 
+    def test_create_argument_definitions_from_dict_rejects_option_name_collisions(
+        self,
+    ):
+        parser = NestedArgumentParser()
+
+        with pytest.raises(
+            ValueError,
+            match=r"Option name collision: '--foo-bar'.*'foo_bar'.*'_foo_bar_'",
+        ):
+            parser.create_argument_definitions_from_dict(
+                {"foo_bar": "first", "_foo_bar_": "second"}
+            )
+
     def test_add_arguments_from_dict_parses_deep_dict_as_json(self):
         parser = NestedArgumentParser()
         parser.add_arguments_from_dict(
