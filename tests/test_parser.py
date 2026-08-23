@@ -193,16 +193,16 @@ class TestNestedArgumentParser:
     def test_create_argument_definitions_from_dict_replaces_underscores(self):
         parser = NestedArgumentParser()
         definitions = parser.create_argument_definitions_from_dict(
-            {"_foo_bar_": "foobar"},
+            {"_user_name_": "alice"},
             max_depth=0,
         )
 
         assert definitions == [
             ArgumentDefinition(
-                "--foo-bar",
-                default="foobar",
+                "--user-name",
+                default="alice",
                 type=str,
-                dest="_foo_bar_",
+                dest="_user_name_",
             )
         ]
 
