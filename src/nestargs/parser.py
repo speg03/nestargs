@@ -80,7 +80,7 @@ def _infer_argument_type(value: Any):
     return str
 
 
-def create_namespace(delimiter: str):
+def _create_namespace(delimiter: str):
     class _NestedNamespace(argparse.Namespace):
         def __setattr__(self, name, value):
             if delimiter in name:
@@ -228,5 +228,5 @@ class NestedArgumentParser(argparse.ArgumentParser):
 
     def parse_known_args(self, args=None, namespace=None):
         if namespace is None:
-            namespace = create_namespace(self.delimiter)
+            namespace = _create_namespace(self.delimiter)
         return super().parse_known_args(args=args, namespace=namespace)
