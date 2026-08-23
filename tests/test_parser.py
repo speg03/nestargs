@@ -63,6 +63,12 @@ class TestNestedArgumentParser:
         assert args.user.name == "alice"
         assert args.user.tags == ["red", "blue"]
 
+    def test_add_arguments_rejects_non_definitions(self):
+        parser = NestedArgumentParser()
+
+        with pytest.raises(TypeError, match="must be an ArgumentDefinition"):
+            parser.add_arguments("user.name")
+
     def test_add_arguments_preserves_explicit_none_default(self):
         parser = NestedArgumentParser()
         parser.add_arguments(
@@ -107,6 +113,39 @@ class TestNestedArgumentParser:
         assert boolean_definition.dest == "enabled"
         assert boolean_definition.type("true") is True
         assert boolean_definition.type("false") is False
+
+    def test_create_argument_definitions_from_dict_infers_scalar_types(self):
+        parser = NestedArgumentParser()
+        custom_value = object()
+
+        definitions = parser.create_argument_definitions_from_dict(
+            {
+                "integer": 1,
+                "floating": 1.5,
+                "string": "value",
+                "custom": custom_value,
+                "optional": None,
+            }
+        )
+
+        assert definitions[0].type is int
+        assert definitions[1].type is float
+        assert definitions[2].type is str
+        assert definitions[3].type is str
+        assert definitions[4].type is None
+
+        parser.add_arguments(definitions)
+        assert parser.parse_args(["--integer", "2"]).integer == 2
+        assert parser.parse_args([]).optional is None
+
+    def test_create_argument_definitions_from_dict_validates_input(self):
+        parser = NestedArgumentParser()
+
+        with pytest.raises(TypeError, match="values must be dict"):
+            parser.create_argument_definitions_from_dict([])  # type: ignore[arg-type]
+
+        with pytest.raises(ValueError, match="max_depth must be >= 0"):
+            parser.create_argument_definitions_from_dict({}, max_depth=-1)
 
     def test_add_arguments_from_dict_parses_deep_dict_as_json(self):
         parser = NestedArgumentParser()
