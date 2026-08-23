@@ -1,12 +1,10 @@
 import importlib.metadata
 
-from .parser import (  # noqa: F401
-    ArgumentDefinition,
-    NestedArgumentParser,
-)
+from .parser import ArgumentDefinition, ArgumentTypeError, NestedArgumentParser
 
 __all__ = [
     "ArgumentDefinition",
+    "ArgumentTypeError",
     "NestedArgumentParser",
 ]
 

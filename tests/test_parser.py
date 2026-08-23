@@ -1,13 +1,11 @@
-import argparse
-
 import pytest
 
-import nestargs
+from nestargs import ArgumentDefinition, ArgumentTypeError, NestedArgumentParser
 
 
 class TestNestedArgumentParser:
     def test_parse_args(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_argument("some.a")
         parser.add_argument("some.b")
         parser.add_argument("some.c.d")
@@ -20,7 +18,7 @@ class TestNestedArgumentParser:
         assert vars(args.some.c).keys() == {"d"}
 
     def test_parse_args_with_another_delimiter(self):
-        parser = nestargs.NestedArgumentParser(delimiter="/")
+        parser = NestedArgumentParser(delimiter="/")
         parser.add_argument("some/a")
         parser.add_argument("some/b")
         parser.add_argument("some/c/d")
@@ -33,21 +31,19 @@ class TestNestedArgumentParser:
         assert vars(args.some.c).keys() == {"d"}
 
     def test_parse_args_with_empty_parent(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_argument(".empty")
 
         with pytest.raises(ValueError):
             parser.parse_args([""])
 
     def test_add_arguments_from_dataclass(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_arguments(
             [
-                nestargs.ArgumentDefinition("user.name", type=str),
-                nestargs.ArgumentDefinition("user.age", type=int, default=0),
-                nestargs.ArgumentDefinition(
-                    "--count", type=int, default=1, dest="limit"
-                ),
+                ArgumentDefinition("user.name", type=str),
+                ArgumentDefinition("user.age", type=int, default=0),
+                ArgumentDefinition("--count", type=int, default=1, dest="limit"),
             ]
         )
 
@@ -57,10 +53,10 @@ class TestNestedArgumentParser:
         assert args.limit == 7
 
     def test_add_arguments_accepts_varargs(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_arguments(
-            nestargs.ArgumentDefinition("user.name", type=str),
-            nestargs.ArgumentDefinition("user.tags", nargs="*", default=[]),
+            ArgumentDefinition("user.name", type=str),
+            ArgumentDefinition("user.tags", nargs="*", default=[]),
         )
 
         args = parser.parse_args(["alice", "red", "blue"])
@@ -68,11 +64,9 @@ class TestNestedArgumentParser:
         assert args.user.tags == ["red", "blue"]
 
     def test_add_arguments_preserves_explicit_none_default(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_arguments(
-            nestargs.ArgumentDefinition(
-                "--mode", nargs="?", default=None, type=str, dest="mode"
-            )
+            ArgumentDefinition("--mode", nargs="?", default=None, type=str, dest="mode")
         )
 
         args = parser.parse_args([])
@@ -82,7 +76,7 @@ class TestNestedArgumentParser:
         assert args.mode == "fast"
 
     def test_create_argument_definitions_from_dict(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         definitions = parser.create_argument_definitions_from_dict(
             {
                 "user": {
@@ -94,7 +88,7 @@ class TestNestedArgumentParser:
             max_depth=1,
         )
 
-        assert definitions[0] == nestargs.ArgumentDefinition(
+        assert definitions[0] == ArgumentDefinition(
             "--user.name",
             default="alice",
             type=str,
@@ -105,7 +99,7 @@ class TestNestedArgumentParser:
         assert profile_definition.default == {"age": 42}
         assert profile_definition.dest == "user.profile"
         assert profile_definition.type('{"age": 43}') == {"age": 43}
-        with pytest.raises(argparse.ArgumentTypeError):
+        with pytest.raises(ArgumentTypeError):
             profile_definition.type("age: 44")
         boolean_definition = definitions[2]
         assert boolean_definition.name == "--enabled"
@@ -115,7 +109,7 @@ class TestNestedArgumentParser:
         assert boolean_definition.type("false") is False
 
     def test_add_arguments_from_dict_parses_deep_dict_as_json(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_arguments_from_dict(
             {"user": {"profile": {"age": 42}}},
             max_depth=1,
@@ -128,14 +122,14 @@ class TestNestedArgumentParser:
             parser.parse_args(["--user.profile", "age: 44"])
 
     def test_add_arguments_from_dict_parses_list_values_as_json(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_arguments_from_dict({"values": [1, "default"]})
 
         definitions = parser.create_argument_definitions_from_dict(
             {"values": [1, "default"]}
         )
         assert definitions == [
-            nestargs.ArgumentDefinition(
+            ArgumentDefinition(
                 "--values",
                 default=[1, "default"],
                 type=definitions[0].type,
@@ -148,7 +142,7 @@ class TestNestedArgumentParser:
         assert args.values == [1, "text", True, None]
 
     def test_add_arguments_from_dict_parses_boolean_values(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         parser.add_arguments_from_dict({"enabled": True})
 
         assert parser.parse_args(["--enabled", "true"]).enabled is True
@@ -158,14 +152,14 @@ class TestNestedArgumentParser:
             parser.parse_args(["--enabled", "invalid"])
 
     def test_create_argument_definitions_from_dict_replaces_underscores(self):
-        parser = nestargs.NestedArgumentParser()
+        parser = NestedArgumentParser()
         definitions = parser.create_argument_definitions_from_dict(
             {"_foo_bar_": "foobar"},
             max_depth=0,
         )
 
         assert definitions == [
-            nestargs.ArgumentDefinition(
+            ArgumentDefinition(
                 "--foo-bar",
                 default="foobar",
                 type=str,
@@ -174,14 +168,14 @@ class TestNestedArgumentParser:
         ]
 
     def test_create_argument_definitions_from_nested_dict_with_underscores(self):
-        parser = nestargs.NestedArgumentParser(delimiter="/")
+        parser = NestedArgumentParser(delimiter="/")
         definitions = parser.create_argument_definitions_from_dict(
             {"user_profile": {"_first_name_": "alice"}},
             max_depth=1,
         )
 
         assert definitions == [
-            nestargs.ArgumentDefinition(
+            ArgumentDefinition(
                 "--user-profile/first-name",
                 default="alice",
                 type=str,
@@ -190,7 +184,7 @@ class TestNestedArgumentParser:
         ]
 
     def test_add_arguments_from_dict_uses_parser_delimiter(self):
-        parser = nestargs.NestedArgumentParser(delimiter="/")
+        parser = NestedArgumentParser(delimiter="/")
         parser.add_arguments_from_dict({"user": {"name": "alice"}}, max_depth=1)
 
         args = parser.parse_args(["--user/name", "alice"])
@@ -201,7 +195,7 @@ class TestNestedArgumentParser:
             max_depth=1,
         )
         assert definitions == [
-            nestargs.ArgumentDefinition(
+            ArgumentDefinition(
                 "--user/name",
                 default="alice",
                 type=str,

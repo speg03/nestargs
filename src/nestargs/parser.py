@@ -7,6 +7,10 @@ DEFAULT_DELIMITER = "."  # default delimiter for nested namespaces
 _MISSING = object()
 
 
+class ArgumentTypeError(argparse.ArgumentTypeError):
+    """Custom exception for argument type errors."""
+
+
 @dataclass(frozen=True)
 class ArgumentDefinition:
     """Definition for a parsed command line argument."""
@@ -37,14 +41,14 @@ def _parse_bool(value: str) -> bool:
         return True
     if normalized == "false":
         return False
-    raise argparse.ArgumentTypeError("expected 'true' or 'false'")
+    raise ArgumentTypeError("expected 'true' or 'false'")
 
 
 def _parse_json(value: str) -> Any:
     try:
         return json.loads(value)
     except json.JSONDecodeError as error:
-        raise argparse.ArgumentTypeError(str(error)) from error
+        raise ArgumentTypeError(str(error)) from error
 
 
 def _infer_argument_type(value: Any):
