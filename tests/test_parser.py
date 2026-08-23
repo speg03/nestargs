@@ -160,6 +160,12 @@ class TestNestedArgumentParser:
                 {"foo_bar": "first", "_foo_bar_": "second"}
             )
 
+    def test_create_argument_definitions_from_dict_rejects_empty_option_key(self):
+        parser = NestedArgumentParser()
+
+        with pytest.raises(ValueError, match="normalizes to an empty string"):
+            parser.create_argument_definitions_from_dict({"___": "value"})
+
     def test_add_arguments_from_dict_parses_deep_dict_as_json(self):
         parser = NestedArgumentParser()
         parser.add_arguments_from_dict(
@@ -172,6 +178,9 @@ class TestNestedArgumentParser:
 
         with pytest.raises(SystemExit):
             parser.parse_args(["--user.profile", "age: 44"])
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--user.profile", "[]"])
 
     def test_add_arguments_from_dict_parses_list_values_as_json(self):
         parser = NestedArgumentParser()
@@ -192,6 +201,9 @@ class TestNestedArgumentParser:
         assert parser.parse_args([]).values == [1, "default"]
         args = parser.parse_args(["--values", '[1, "text", true, null]'])
         assert args.values == [1, "text", True, None]
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--values", '{"value": 1}'])
 
     def test_add_arguments_from_dict_parses_boolean_values(self):
         parser = NestedArgumentParser()
