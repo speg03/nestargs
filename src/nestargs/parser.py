@@ -78,7 +78,7 @@ def create_namespace(delimiter: str):
                     super().__setattr__(parent, self.__class__())
                 setattr(getattr(self, parent), name, value)
             elif parent is not None:
-                raise ValueError("parent should not be empty: {}".format(name))
+                raise ValueError(f"parent should not be empty: {name}")
             else:
                 super().__setattr__(name, value)
 
