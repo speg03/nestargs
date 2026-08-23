@@ -23,8 +23,9 @@ class ArgumentDefinition:
 
 
 def _normalize_option_key(name: str) -> str:
-    normalized = name.strip("_")
-    normalized = normalized.replace("_", "-")
+    normalized = name.strip("_").replace("_", "-")
+    if not normalized:
+        raise ValueError(f"Option key {name!r} normalizes to an empty string")
     return normalized
 
 
@@ -49,6 +50,20 @@ def _parse_json(value: str) -> Any:
         return json.loads(value)
     except json.JSONDecodeError as error:
         raise ArgumentTypeError(str(error)) from error
+
+
+def _parse_json_array(value: str) -> list[Any]:
+    parsed = _parse_json(value)
+    if not isinstance(parsed, list):
+        raise ArgumentTypeError("expected a JSON array")
+    return parsed
+
+
+def _parse_json_object(value: str) -> dict[str, Any]:
+    parsed = _parse_json(value)
+    if not isinstance(parsed, dict):
+        raise ArgumentTypeError("expected a JSON object")
+    return parsed
 
 
 def _infer_argument_type(value: Any):
@@ -128,11 +143,11 @@ class NestedArgumentParser(argparse.ArgumentParser):
         *,
         max_depth: int = 1,
     ):
-        """Create ArgumentDefinition objects from a nested dictionary.
+"""Create ArgumentDefinition objects from a nested dictionary.
 
-        Arguments deeper than max_depth are treated as a single string-valued CLI
-        argument whose value is the literal string representation of the nested dict.
-        """
+Lists, and dictionaries deeper than max_depth, are treated as a single CLI argument
+whose value is supplied as JSON (array/object respectively).
+"""
         if not isinstance(values, dict):
             raise TypeError(f"values must be dict, got {type(values).__name__}")
         if max_depth < 0:
@@ -169,7 +184,7 @@ class NestedArgumentParser(argparse.ArgumentParser):
                             ArgumentDefinition(
                                 name=option_name,
                                 default=value,
-                                type=_parse_json,
+                                type=_parse_json_object,
                                 dest=full_dest,
                             )
                         )
@@ -180,7 +195,7 @@ class NestedArgumentParser(argparse.ArgumentParser):
                         ArgumentDefinition(
                             name=option_name,
                             default=value,
-                            type=_parse_json,
+                            type=_parse_json_array,
                             dest=full_dest,
                         )
                     )

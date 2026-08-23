@@ -37,7 +37,7 @@ class TestNestedArgumentParser:
         with pytest.raises(ValueError):
             parser.parse_args([""])
 
-    def test_add_arguments_from_dataclass(self):
+    def test_add_arguments_from_definitions_list(self):
         parser = NestedArgumentParser()
         parser.add_arguments(
             [
