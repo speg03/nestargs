@@ -1,0 +1,8 @@
+{
+  "name": "nestargs-release-tools",
+  "private": true,
+  "devDependencies": {
+    "semantic-release": "25.0.9",
+    "@semantic-release/exec": "7.1.0"
+  }
+}
