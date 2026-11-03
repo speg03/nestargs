@@ -31,8 +31,14 @@ dev = [
   { include-group = "docs" },
   { include-group = "tests" },
 ]
-docs = ["zensical>=0.0.54"]
-tests = ["pre-commit>=4.6.1", "pytest>=9.1.1", "pytest-cov>=7.1.0"]
+docs = [
+  "zensical>=0.0.54",
+]
+tests = [
+  "pre-commit>=4.6.1",
+  "pytest>=9.1.1",
+  "pytest-cov>=7.1.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.12.0,<0.14.0"]
